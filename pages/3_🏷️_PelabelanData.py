@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -9,6 +10,39 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import ast
 from wordcloud import WordCloud
+from nltk.tokenize import word_tokenize
+import nltk
+
+# Unduh tokenizer NLTK yang diperlukan
+nltk.download('punkt')
+
+# Memuat CSS dari file eksternal
+css_path = os.path.join("assets", "style.css")
+if os.path.exists(css_path):
+    with open(css_path, "r") as f:
+        css = f.read()
+    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+else:
+    st.warning("File CSS tidak ditemukan di 'assets/style.css'. Menggunakan tampilan default.")
+
+def load_sentiment_lexicon():
+    positive_url = "https://raw.githubusercontent.com/fajri91/InSet/master/positive.tsv"
+    negative_url = "https://raw.githubusercontent.com/fajri91/InSet/master/negative.tsv"
+    
+    try:
+        positive_lexicon = set(pd.read_csv(positive_url, sep="\t", header=None)[0])
+    except Exception as e:
+        st.warning(f"Gagal memuat positive.tsv dari URL: {e}")
+        positive_lexicon = set()
+    
+    try:
+        negative_lexicon = set(pd.read_csv(negative_url, sep="\t", header=None)[0])
+    except Exception as e:
+        st.warning(f"Gagal memuat negative.tsv dari URL: {e}")
+        negative_lexicon = set()
+    
+    return positive_lexicon, negative_lexicon
+
 
 # Fungsi utilitas
 def load_data(uploaded_file):
@@ -114,15 +148,24 @@ def main():
     # Step 1: Pelabelan Data
     st.subheader("Step 1: Pelabelan Data")
     if st.button("Label Data"):
-        def label_sentiment(rating):
-            if rating <= 2:
-                return 'Negative'
-            elif rating == 3:
-                return 'Neutral'
-            else:
-                return 'Positive'
+        positive_lexicon, negative_lexicon = load_sentiment_lexicon()
         
-        data['Sentiment'] = data['Rating'].apply(label_sentiment)
+        def label_sentiment(text):
+            tokens = word_tokenize(text)
+            positive_count = sum(1 for token in tokens if token in positive_lexicon)
+            negative_count = sum(1 for token in tokens if token in negative_lexicon)
+            sentiment_score = positive_count - negative_count
+    
+            if sentiment_score > 0:
+                sentiment = "Positive"
+            elif sentiment_score < 0:
+                sentiment = "Negative"
+            else:
+                sentiment = "Neutral"
+    
+            return sentiment
+        
+        data['Sentiment'] = data['Stemmed Reviews Text'].apply(label_sentiment)
         data = preprocess_for_model(data)
         
         st.session_state['labeled_data'] = data

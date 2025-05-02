@@ -6,13 +6,8 @@ import pandas as pd
 st.title("Scraping Ulasan Aplikasi Google Play Store")
 st.write("Aplikasi ini menampilkan semua ulasan terbaru dari aplikasi di Google Play Store tanpa batasan jumlah.")
 
-app_id = "id.co.bitcoin"
-#com.binance.cloud.tokocrypto
-#id.co.bitcoin
-#id.co.triv
-#com.coinbase.androids
-#com.EmasDigi
-#com.bitkeep.wallet
+# Input manual untuk app_id
+app_id = st.text_input("Masukkan ID Aplikasi (contoh: id.co.bitcoin untuk Indodax):", value="id.co.bitcoin")
 
 # Input jumlah ulasan yang ingin diambil (tanpa batasan maksimal)
 count = st.number_input("Masukkan jumlah ulasan yang ingin diambil (0 untuk semua ulasan):", 
