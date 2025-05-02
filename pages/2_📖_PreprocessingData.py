@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import os
 import re
 import nltk
 from nltk.tokenize import word_tokenize
@@ -16,8 +17,15 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 from collections import Counter
 
-# Set page configuration
-st.set_page_config(layout="wide")
+# Load CSS from external file
+css_path = os.path.join("assets", "style.css")
+if os.path.exists(css_path):
+    with open(css_path, "r") as f:
+        css = f.read()
+    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+else:
+    st.warning("CSS file not found in 'assets/style.css'. Using default appearance.")
+
 
 # Download NLTK data
 try:
@@ -140,7 +148,8 @@ def PreprocessingData():
         if st.button("Normalisasi Data"):
             data = st.session_state['cleaned_data'].copy()
             try:
-                kamus_kata_baku = pd.read_excel('kamuskatabaku.xlsx')
+                kamus_kata_baku_path = os.path.join("assets", "kamuskatabaku.xlsx")
+                kamus_kata_baku = pd.read_excel(kamus_kata_baku_path)
                 norm_dict = dict(zip(kamus_kata_baku['tidak_baku'], kamus_kata_baku['kata_baku']))
                 
                 data['Normalized Reviews Text'] = data['Cleaned Reviews Text'].apply(
