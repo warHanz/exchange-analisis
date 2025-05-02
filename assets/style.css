@@ -1,0 +1,85 @@
+/* Styling untuk dashboard kreatif */
+body {
+	/* background: linear-gradient(135deg, #e0e7ff, #f3e8ff); */
+	font-family: "Poppins", sans-serif;
+	color: #2d3748;
+}
+
+.card {
+	background: linear-gradient(135deg, #a1c4fd, #c3e0fd);
+	padding: 20px;
+	border-radius: 15px;
+	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+	margin-bottom: 20px;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+	transform: translateY(-5px);
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.card-visual {
+	background: linear-gradient(135deg, #b5f5d8, #81e6d9);
+}
+
+.card-model {
+	background: linear-gradient(135deg, #fed7aa, #f9a8d4);
+}
+
+h1,
+h2,
+h3 {
+	color: #1a202c;
+	text-align: center;
+	font-weight: 600;
+}
+
+.stButton > button {
+	background: linear-gradient(135deg, #667eea, #764ba2);
+	color: white;
+	border-radius: 8px;
+	padding: 10px 20px;
+	border: none;
+	font-weight: 500;
+	transition: background 0.3s ease;
+}
+
+.stButton > button:hover {
+	background: linear-gradient(135deg, #5a67d8, #6b46c1);
+}
+
+.stSelectbox {
+	background: white;
+	border-radius: 8px;
+	padding: 8px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stFileUploader {
+	background: white;
+	border-radius: 8px;
+	padding: 10px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stPlotlyChart,
+.stImage {
+	background: white;
+	border-radius: 10px;
+	padding: 10px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.stDataFrame {
+	background: white;
+	border-radius: 8px;
+	padding: 10px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+	font-size: 24px;
+	margin-right: 10px;
+	vertical-align: middle;
+}
