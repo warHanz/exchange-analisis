@@ -1,0 +1,101 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, classification_report
+from functools import lru_cache
+import logging
+import numpy as np
+from sklearn.model_selection import GridSearchCV
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+@lru_cache(maxsize=1)
+def create_vectorizer(max_features=8000, ngram_range=(1, 3), min_df=1):
+    """Create and cache a TF-IDF vectorizer with specified parameters."""
+    logger.info(f"Creating TF-IDF vectorizer with max_features={max_features}, ngram_range={ngram_range}, min_df={min_df}")
+    return TfidfVectorizer(ngram_range=ngram_range, max_features=max_features, min_df=min_df)
+
+def prepare_data(texts, labels, test_size=0.2, random_state=42, max_features=8000, ngram_range=(1, 3), min_df=1):
+    """
+    Split data into training and testing sets and convert texts to TF-IDF features.
+    """
+    if texts.empty or labels.empty or len(texts) != len(labels):
+        logger.error("Invalid input: texts or labels are empty or mismatched")
+        raise ValueError("Texts and labels must be non-empty and have the same length")
+
+    logger.info("Preparing data: splitting and transforming to TF-IDF")
+    X_train, X_test, y_train, y_test = train_test_split(
+        texts, labels, test_size=test_size, random_state=random_state
+    )
+    
+    vectorizer = create_vectorizer(max_features, ngram_range, min_df)
+    X_train_tfidf = vectorizer.fit_transform(X_train)
+    X_test_tfidf = vectorizer.transform(X_test)
+    
+    logger.info(f"Data prepared: {X_train_tfidf.shape[0]} training samples, {X_test_tfidf.shape[0]} test samples")
+    return X_train_tfidf, X_test_tfidf, y_train, y_test, vectorizer
+
+def train_and_evaluate_models(X_train_tfidf, X_test_tfidf, y_train, y_test, svm_params=None, nb_params=None):
+    """
+    Train and evaluate SVM and Naive Bayes models with hyperparameter tuning.
+    """
+
+    if X_train_tfidf.shape[0] == 0 or X_test_tfidf.shape[0] == 0:
+        logger.error("Empty training or test data")
+        raise ValueError("Training and test data must not be empty")
+
+    # Default parameter grids for tuning
+    svm_param_grid = svm_params or {
+        'kernel': ['linear', 'rbf'],
+        'C': [0.5, 1.0, 2.0, 5.0],
+        'gamma': ['scale', 'auto'],
+        'probability': [True]
+    }
+    nb_param_grid = nb_params or {
+        'alpha': [0.1, 0.5, 1.0]
+    }
+
+    results = {}
+
+    # SVM with GridSearchCV
+    logger.info("Tuning and training SVM model")
+    try:
+        svm = SVC()
+        svm_grid = GridSearchCV(svm, svm_param_grid, cv=3, n_jobs=-1, scoring='accuracy')
+        svm_grid.fit(X_train_tfidf, y_train)
+        best_svm = svm_grid.best_estimator_
+        predictions = best_svm.predict(X_test_tfidf)
+        results['SVM'] = {
+            'pred': predictions,
+            'acc': accuracy_score(y_test, predictions),
+            'report': classification_report(y_test, predictions, output_dict=True, zero_division=0),
+            'best_params': svm_grid.best_params_
+        }
+        logger.info(f"SVM best params: {svm_grid.best_params_} Accuracy: {results['SVM']['acc']:.2f}")
+    except Exception as e:
+        logger.error(f"Error training SVM model: {e}")
+        results['SVM'] = {'error': str(e)}
+
+    # Naive Bayes with GridSearchCV
+    logger.info("Tuning and training Naive Bayes model")
+    try:
+        nb = MultinomialNB()
+        nb_grid = GridSearchCV(nb, nb_param_grid, cv=3, n_jobs=-1, scoring='accuracy')
+        nb_grid.fit(X_train_tfidf, y_train)
+        best_nb = nb_grid.best_estimator_
+        predictions = best_nb.predict(X_test_tfidf)
+        results['Naive Bayes'] = {
+            'pred': predictions,
+            'acc': accuracy_score(y_test, predictions),
+            'report': classification_report(y_test, predictions, output_dict=True, zero_division=0),
+            'best_params': nb_grid.best_params_
+        }
+        logger.info(f"Naive Bayes best params: {nb_grid.best_params_} Accuracy: {results['Naive Bayes']['acc']:.2f}")
+    except Exception as e:
+        logger.error(f"Error training Naive Bayes model: {e}")
+        results['Naive Bayes'] = {'error': str(e)}
+
+    return results

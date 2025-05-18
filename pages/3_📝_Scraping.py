@@ -1,13 +1,28 @@
 import streamlit as st
 from google_play_scraper import reviews, Sort
 import pandas as pd
+import re
+
+# Fungsi untuk ekstrak app_id dari URL
+def extract_app_id(url):
+    match = re.search(r'id=([a-zA-Z0-9._]+)', url)
+    if match:
+        return match.group(1)
+    else:
+        return url  # fallback jika user tetap memasukkan app_id langsung
 
 # Judul aplikasi
 st.title("Scraping Ulasan Aplikasi Google Play Store")
 st.write("Aplikasi ini menampilkan semua ulasan terbaru dari aplikasi di Google Play Store tanpa batasan jumlah.")
 
-# Input manual untuk app_id
-app_id = st.text_input("Masukkan ID Aplikasi (contoh: id.co.bitcoin untuk Indodax):", value="id.co.bitcoin")
+# Input URL aplikasi atau app_id
+input_url = st.text_input(
+    "Masukkan URL aplikasi Google Play Store atau App ID (contoh: https://play.google.com/store/apps/details?id=id.co.bitcoin):",
+    value=""
+)
+
+# Ekstrak app_id
+app_id = extract_app_id(input_url)
 
 # Input jumlah ulasan yang ingin diambil (tanpa batasan maksimal)
 count = st.number_input("Masukkan jumlah ulasan yang ingin diambil (0 untuk semua ulasan):", 

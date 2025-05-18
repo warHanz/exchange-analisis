@@ -1,5 +1,6 @@
 import streamlit as st
 from utils.utils import *
+from models.models import prepare_data, train_and_evaluate_models
 
 # Konfigurasi Streamlit
 st.set_page_config(layout="wide", page_title="Sentiment Analysis Dashboard")
@@ -109,27 +110,11 @@ def main():
                      "Model tidak dapat dilatih karena memerlukan minimal 2 kelas.")
             return
 
-        # Split data dan pelatihan model
-        X_train, X_test, y_train, y_test = train_test_split(
-            processed_data['Text_for_Model'], processed_data['Sentiment'], test_size=0.2, random_state=42)
-        
-        vectorizer = TfidfVectorizer(ngram_range=(1, 2), max_features=5000, min_df=2)
-        X_train_tfidf = vectorizer.fit_transform(X_train)
-        X_test_tfidf = vectorizer.transform(X_test)
-
-        models = {
-            'SVM': SVC(kernel='rbf', C=1.0, probability=True),
-            'Naive Bayes': MultinomialNB()
-        }
-        results = {}
-        for name, model in models.items():
-            model.fit(X_train_tfidf, y_train)
-            predictions = model.predict(X_test_tfidf)
-            results[name] = {
-                'pred': predictions,
-                'acc': accuracy_score(y_test, predictions),
-                'report': classification_report(y_test, predictions, output_dict=True)
-            }
+        # Split data dan pelatihan model menggunakan models.py
+        X_train_tfidf, X_test_tfidf, y_train, y_test, vectorizer = prepare_data(
+            processed_data['Text_for_Model'], processed_data['Sentiment']
+        )
+        results = train_and_evaluate_models(X_train_tfidf, X_test_tfidf, y_train, y_test)
 
     # Visualisasi Preprocessing
     col1, col2 = st.columns(2)
@@ -171,12 +156,12 @@ def main():
     col_model1, col_model2 = st.columns(2)
 
     with col_model1:
-        st.plotly_chart(plot_data_split(len(X_train), len(X_test)), use_container_width=True)
+        st.plotly_chart(plot_data_split(X_train_tfidf.shape[0], X_test_tfidf.shape[0]), use_container_width=True)
 
     with col_model2:
         st.plotly_chart(plot_accuracy_comparison(results), use_container_width=True)
 
-    for name in models:
+    for name in results:
         st.write(f"### {name}")
         col_eval1, col_eval2 = st.columns(2)
         with col_eval1:
