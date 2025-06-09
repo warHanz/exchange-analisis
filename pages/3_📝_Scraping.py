@@ -12,7 +12,7 @@ def extract_app_id(url):
         return url  # fallback jika user tetap memasukkan app_id langsung
 
 # Judul aplikasi
-st.title("Scraping Ulasan Aplikasi Google Play Store")
+st.title("Scraping Ulasan Aplikasi Pada Google Play Store")
 st.write("Aplikasi ini menampilkan semua ulasan terbaru dari aplikasi di Google Play Store tanpa batasan jumlah.")
 
 # Input URL aplikasi atau app_id

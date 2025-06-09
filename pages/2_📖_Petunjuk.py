@@ -21,11 +21,11 @@ def guide():
     graphviz_code = """
     digraph {
         rankdir=TB;  // Top to Bottom (default)
-        node [shape=box, style=filled, color="#FF4B4B", fontname="Arial", fontsize=14, fontcolor=white, width=2.8, height=0.8];
+        node [shape=box, style=filled, color="#FF4B4B", fontname="Arial", fontsize=14, fontcolor=white, width=4.7, height=0.5];
         edge [color="#FF4B4B", penwidth=2];
 
-        Scraping [label="Scraping Data"];
-        Preprocessing [label="Preprocessing Data"];
+        Scraping [label="Scraping Data Halaman scraping"];
+        Preprocessing [label="Preprocessing Data Pada Halaman Analisis"];
         SentimentAnalysis [label="Analisis Sentimen"];
         Visualization [label="Visualisasi Hasil"];
 
@@ -36,27 +36,26 @@ def guide():
     """
 
     with col1:
-        st.subheader("Alur Proses")
+        st.subheader("Petunjuk Penggunaan")
         st.graphviz_chart(graphviz_code, use_container_width=True)
 
     with col2:
-        st.subheader("Penjelasan Prosedur")
+        st.subheader("Petunjuk Penggunaan")
 
-        st.markdown("### 1. Scraping Data")
+        st.markdown("### 1. Scraping Data  Halaman scraping")
         st.write(
             """
-            - Mengumpulkan data dari sumber eksternal seperti media sosial, forum, atau situs ulasan.
-            - Mengambil data dalam bentuk teks yang relevan untuk dianalisis.
-            - Memastikan data bersih dari duplikasi dan sesuai kebutuhan analisis.
+            - Buka Browser kemudian cari google play store.
+            - Masuk ke bagian aplikasi yang ingin di scraping datanya lalu salin url contoh "https://play.google.com/store/apps/details?id=id.co.bitcoin".
+            - Masukan jumlah data yang diinginkan lalu unduh dataset berupa file csv tersebut.
             """
         )
 
         st.markdown("### 2. Preprocessing Data")
         st.write(
             """
-            - Membersihkan teks dari karakter spesial, tautan, dan tanda baca yang tidak diperlukan.
-            - Melakukan tokenisasi, normalisasi, dan menghapus kata tidak penting (stopwords).
-            - Menyiapkan data agar siap dianalisis dengan hasil lebih akurat.
+            - Pergi kehalaman analisis.
+            - Unggah file dataset file berupa cvs atau jika belum mempunyai dataset bisa menuju halaman scraping dahulu.
             """
         )
 
@@ -64,7 +63,7 @@ def guide():
         st.write(
             """
             - Menerapkan model untuk menentukan sentimen teks: positif, negatif, atau netral.
-            - Model dapat menggunakan metode machine learning atau lexicon-based.
+            - Model dapat menggunakan metode supervised learning dan naive bayes classifier.
             - Menghasilkan label sentimen dan skor kepercayaan untuk setiap data.
             """
         )
@@ -73,7 +72,7 @@ def guide():
         st.write(
             """
             - Menampilkan hasil analisis dalam bentuk grafik atau dashboard interaktif.
-            - Memudahkan pemahaman distribusi sentimen dan insight penting.
+            - Memudahkan pemahaman distribusi sentimen.
             - Membantu pengambilan keputusan berbasis hasil analisis.
             """
         )

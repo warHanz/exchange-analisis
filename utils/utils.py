@@ -24,6 +24,28 @@ nltk.download(['punkt', 'stopwords'], quiet=True)
 factory = StemmerFactory()
 stemmer = factory.create_stemmer()
 
+STOPWORDS_TO_REMOVE = {
+    'tidak', 'bukan', 'belum', 'jangan', 'saya', 'kamu', 'dia', 'mereka', 'kita', 'kami',
+    'itu', 'ini', 'ada', 'perlu', 'sama', 'saat', 'seperti', 'dari', 'ke', 'untuk',
+    'pada', 'dan', 'atau', 'yang', 'dengan', 'di', 'ya', 'asu', 'sih', 'lah', 'gak',
+    'nggak', 'kok', 'dong', 'nih', 'aja', 'bisa', 'cuma', 'woi', 'indodax' 
+}
+
+CUSTOM_STOPWORDS = {
+    'adalah', 'akan', 'antara', 'apa', 'apabila', 'atas', 'bagaimana', 'bagi', 'bahwa',
+    'berada', 'berapa', 'berikut', 'bersama', 'boleh', 'banyak', 'baru', 'bila', 'bilang',
+    'cara', 'cukup', 'dapat', 'demi', 'demikian', 'depan', 'dulu', 'harus', 'hanya',
+    'hingga', 'ia', 'ialah', 'jika', 'justru', 'kapan', 'karena', 'karenanya', 'kemudian',
+    'kini', 'lagi', 'lalu', 'lebih', 'maupun', 'melainkan', 'menjadi', 'menuju', 'meski',
+    'mungkin', 'oleh', 'paling', 'para', 'per', 'pernah', 'saja', 'sambil', 'sampai',
+    'sangat', 'sebelum', 'sekarang', 'secara', 'sedang', 'selain', 'selama', 'seluruh',
+    'semua', 'sesudah', 'setelah', 'setiap', 'sudah', 'supaya', 'tapi', 'tentang',
+    'terhadap', 'termasuk', 'ternyata', 'tetap', 'tetapi', 'tiap', 'tuju', 'turut', 'umum',
+    'yaitu' 
+}
+
+STOPWORDS_ALL = set(stopwords.words('indonesian')).union(STOPWORDS_TO_REMOVE)
+
 def load_sentiment_lexicon():
     positive_url = "https://raw.githubusercontent.com/fajri91/InSet/master/positive.tsv"
     negative_url = "https://raw.githubusercontent.com/fajri91/InSet/master/negative.tsv"
@@ -62,8 +84,14 @@ def preprocess_data(data):
 def clean_text(text):
     if pd.isna(text):
         return ''
+    
     text = str(text).lower()  # Case folding
-    return re.sub(r'[^a-z\s]', '', text).strip()  # Cleaning
+    text = re.sub(r'http\S+|www\S+|https\S+', '', text, flags=re.MULTILINE)  # Remove URLs
+    text = re.sub(r'@\w+', '', text)  # Remove mentions
+    text = re.sub(r'#\w+', '', text)  # Remove hashtags
+    text = re.sub(r'\s+', ' ', text).strip()  # Remove extra spaces
+    text = re.sub(r'[^a-z\s]', '', text).strip()  # Remove non-alphabetic characters
+    return text
 
 def normalize_text(text, norm_dict):
     if norm_dict:
@@ -76,16 +104,29 @@ def tokenize_text(text):
     return []
 
 def remove_stopwords(tokens):
-    stop_words = set(stopwords.words('indonesian')) - {'tidak', 'bukan'}
-    return [token for token in tokens if token not in stop_words]
+    filtered_tokens = []
+    print(f"Tokens sebelum hapus stopwords: {tokens}")
+    print(f"Stopwords yang digunakan: {sorted(STOPWORDS_ALL)}")
+    for token in tokens:
+        if token in STOPWORDS_TO_REMOVE:
+            print(f"Kata '{token}' dihapus karena ada di STOPWORDS_TO_REMOVE")
+        elif token in STOPWORDS_ALL:
+            print(f"Kata '{token}' dihapus karena termasuk stopword")
+        else:
+            filtered_tokens.append(token)
+            print(f"Kata '{token}' dipertahankan")
+    print(f"Tokens sesudah hapus stopwords: {filtered_tokens}")
+    return filtered_tokens
 
 def stem_tokens(tokens):
-    return [stemmer.stem(token) for token in tokens]
+    stemmed = [stemmer.stem(token) for token in tokens]
+    return [token for token in stemmed if len(token) >= 3]
 
 def label_sentiment(tokens, positive_words, negative_words):
-    positive_count = sum(1 for token in tokens if token in positive_words)
-    negative_count = sum(1 for token in tokens if token in negative_words)
-    sentiment_score = positive_count - negative_count
+    
+    positive_lexicon = sum(1 for token in tokens if token in positive_words)
+    negative_lexicon = sum(1 for token in tokens if token in negative_words)
+    sentiment_score = positive_lexicon - negative_lexicon
 
     if sentiment_score > 0:
         sentiment = "Positive"

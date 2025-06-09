@@ -4,9 +4,9 @@ import os
 
 # Set page configuration
 st.set_page_config(
-    page_title="Crypto Exchange Sentiment Analysis",
+    page_title="CryptoSentiment Analyzer",
+    page_icon="📊",
     layout="wide",
-    initial_sidebar_state="collapsed"
 )
 
 # Function to load and apply CSS from file
@@ -17,6 +17,14 @@ def load_css(css_file):
     else:
         st.warning(f"CSS file not found: {css_file}")
 
+def add_logo_to_sidebar():
+    logo_path = os.path.join("assets", "image", "logo.png")  # Ganti dengan path logo Anda
+    if os.path.exists(logo_path):
+        logo = Image.open(logo_path)
+        st.sidebar.image(logo, use_column_width=True)
+    else:
+        st.sidebar.markdown("Logo tidak ditemukan.")
+
 # Hero section with full-width image and overlay text
 def hero_section():
     image_path = os.path.join("assets", "image", "hero.jpg")
@@ -26,11 +34,11 @@ def hero_section():
     
     if os.path.exists(image_path):
         img = Image.open(image_path)
-        st.image(img, use_container_width=True)
+        st.image(img, use_container_width=False)
     else:
         # Fallback to a colored div if image doesn't exist
         st.markdown("""
-        <div style="width:30%; height:30px; background:linear-gradient(135deg, #18d26e, #0a6e3a); margin-top:-80px;"></div>
+        <div style="width:100%; height:30px; background:linear-gradient(135deg, #18d26e, #0a6e3a); margin-top:-80px;"></div>
         """, unsafe_allow_html=True)
 
     
@@ -46,15 +54,15 @@ def description_section():
     st.markdown('<div class="content-section">', unsafe_allow_html=True)
     st.markdown('<h2 class="section-title">Tentang Aplikasi</h2>', unsafe_allow_html=True)
     st.markdown("""
-    <p class="section-text">
-        Selamat datang di aplikasi analisis sentimen untuk exchange crypto! 
-        Temukan wawasan terbaru tentang persepsi publik terhadap berbagai platform pertukaran kripto. 
-        Data diolah dari berbagai sumber untuk membantu Anda mengambil keputusan investasi yang lebih baik.
-    </p>
-    <p class="section-text">
-        Aplikasi ini menganalisis sentimen publik terhadap exchange crypto menggunakan data dari berbagai sumber. 
-        Dapatkan insight mengenai reputasi dan kepercayaan pengguna terhadap platform exchange favorit Anda.
-    </p>
+     <p>
+                CryptoSentiment Analyzer adalah platform analisis sentimen yang dirancang khusus 
+                untuk menganalisis ulasan dan review aplikasi exchange crypto dari platform 
+                Google Play Store. Aplikasi ini membantu investor, trader, dan pengembang 
+                untuk memahami persepsi publik terhadap platform trading crypto favorit mereka.
+                Dengan memanfaatkan teknologi Natural Language Processing (NLP) dan Machine Learning, 
+                untuk memberikan insights mendalam tentang sentimen pengguna, tren kepuasan, dan aspek-aspek 
+                yang bisa diperhatikan oleh komunitas crypto trading.
+            </p>
     """, unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -69,8 +77,8 @@ def features_section():
         st.markdown("""
         <div class="feature-card">
             <div class="feature-icon">📊</div>
-            <h3 class="feature-title">Analisis Real-Time</h3>
-            <p class="feature-desc">Dapatkan insight sentimen pasar crypto terbaru yang diperbarui secara real-time.</p>
+            <h3 class="feature-title">Sentimen Analisis</h3>
+            <p class="feature-desc">Ketahui Sentimen ulasan pengguna terhadap aplikasi.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -78,8 +86,8 @@ def features_section():
         st.markdown("""
         <div class="feature-card">
             <div class="feature-icon">🔍</div>
-            <h3 class="feature-title">Detail Exchange</h3>
-            <p class="feature-desc">Lihat detail dan perbandingan sentimen untuk berbagai exchange crypto populer.</p>
+            <h3 class="feature-title">Sentimen Text</h3>
+            <p class="feature-desc">Mengetahui Hasil sentimen Positif, netral dan Negatif.</p>
         </div>
         """, unsafe_allow_html=True)
         
@@ -87,8 +95,8 @@ def features_section():
         st.markdown("""
         <div class="feature-card">
             <div class="feature-icon">📈</div>
-            <h3 class="feature-title">Tren Historis</h3>
-            <p class="feature-desc">Analisis perubahan sentimen dari waktu ke waktu untuk melihat tren dan pola.</p>
+            <h3 class="feature-title">Visualisasi Dashboard</h3>
+            <p class="feature-desc">Visualisasi hasil data mengenai sentimen ulasan aplikasi.</p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -100,7 +108,7 @@ def cta_section():
     st.markdown('<h2 class="section-title" style="display: inline-block; margin-bottom: 1.5rem;">Mulai Analisis Anda</h2>', unsafe_allow_html=True)
     st.markdown("""
     <p class="section-text" style="margin-bottom: 2rem;">
-        Siap untuk memulai? Eksplorasi sentimen pasar crypto sekarang juga dan dapatkan keunggulan dalam keputusan investasi Anda.
+        Siap untuk memulai? Eksplorasi sentimen aplikasi exchange crypto sekarang juga.
     </p>
     """, unsafe_allow_html=True)
     # Use Streamlit's button for navigation, keep the default button style

@@ -24,7 +24,7 @@ def main():
             return
 
         # 1. Data Overview - Sebelum Diproses
-        st.subheader("📋 Data Overview - Sebelum Diproses")
+        st.subheader("📋 Data Overview")
         st.write("Ringkasan dataset asli yang diunggah.")
         
         # Total Data dan Average Rating
@@ -84,15 +84,7 @@ def main():
         processed_data = processed_data[processed_data['Stemmed'].apply(len) > 0]
 
         # 2. Data Overview - Setelah Diproses
-        st.subheader("📋 Data Overview - Setelah Diproses")
-        st.write("Ringkasan data setelah preprocessing.")
-        
-        # Grafik: Distribusi Panjang Teks Setelah Stemming
-        processed_data['Word Count'] = processed_data['Stemmed'].apply(len)
-        fig = px.histogram(processed_data, x='Word Count', nbins=30, 
-                          title="Distribusi Jumlah Kata Setelah Stemming",
-                          color_discrete_sequence=px.colors.qualitative.Pastel)
-        st.plotly_chart(fig, use_container_width=True)
+        st.subheader("📋 Tabel")
         
         st.write("Tabel: Teks asli, dibersihkan, dinormalisasi, ditokenisasi, dan stopwords dihapus.")
         st.dataframe(processed_data[['Processing', 'Clean', 'Normalize', 'Tokenize', 'Remove Stopword', 'Stemmed']])
@@ -137,14 +129,26 @@ def main():
                     fig, ax = plt.subplots(figsize=(6, 3))
                     ax.imshow(generate_wordcloud(sentiment_data, f"{sentiment}", color), interpolation='bilinear')
                     ax.axis('off')
-                    st.pyplot(fig)
+                    st.pyplot(fig) 
 
     with col2:
         st.subheader("📈 Distribusi Sentimen")
         sentiment_counts = processed_data['Sentiment'].value_counts()
-        fig = px.pie(values=sentiment_counts.values, names=sentiment_counts.index,
-                    title="Distribusi Sentimen", hole=0.3,
-                    color_discrete_sequence=px.colors.qualitative.Pastel)
+        # Definisikan warna untuk masing-masing sentimen
+        colors = {
+            'Positive': '#00FF00',  # Hijau
+            'Negative': '#FF0000',  # Merah
+            'Neutral': '#808080'    # Abu-abu
+        }
+        # Urutkan warna sesuai dengan indeks sentimen
+        color_list = [colors.get(sentiment, '#808080') for sentiment in sentiment_counts.index]
+        fig = px.pie(
+            values=sentiment_counts.values,
+            names=sentiment_counts.index,
+            title="Distribusi Sentimen",
+            hole=0.3,
+            color_discrete_sequence=color_list  # Gunakan warna yang ditentukan
+        )
         st.plotly_chart(fig, use_container_width=True)
 
     # Top 10 Kata
